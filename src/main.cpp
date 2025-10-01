@@ -1,4 +1,7 @@
 #include <SDL3/SDL.h>
+#include <bgfx/bgfx.h>
+#include <bx/bx.h>
+#include <bx/platform.h>
 #include <iostream>
 #include <string>
 
