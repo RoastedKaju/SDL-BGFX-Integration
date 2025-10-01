@@ -1,80 +1,92 @@
 #include <SDL3/SDL.h>
+#define NOMINMAX
+#include <Windows.h>
 #include <bgfx/bgfx.h>
+#include <bgfx/platform.h>
 #include <bx/bx.h>
-#include <bx/platform.h>
 #include <iostream>
 #include <string>
 
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
 
+void ResetBgfxView(const SDL_WindowEvent& windowEvent);
+
 int main() {
-  if (SDL_Init(SDL_INIT_VIDEO) == true) {
-    SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "SDL video Initialized");
+  bool is_running = true;
+
+  // Initialize SDL
+  if (!SDL_Init(SDL_INIT_VIDEO)) {
+    SDL_Log("Failed to Initialize SDL");
+    return 1;
   }
 
-  // Window
-  SDL_Window* window = SDL_CreateWindow("My window", SCREEN_WIDTH,
-                                        SCREEN_HEIGHT, SDL_WINDOW_RESIZABLE);
-  // Renderer
-  SDL_Renderer* renderer = SDL_CreateRenderer(window, NULL);
+  // SDL window
+  SDL_Window* main_window = SDL_CreateWindow(
+      "sdl-bgfx window", SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_RESIZABLE);
 
-  SDL_FRect movingRect;
-  movingRect.h = 75.0f;
-  movingRect.w = 100.0f;
-  movingRect.x = 50.0f;
-  movingRect.y = 50.0f;
+  if (!main_window) {
+    SDL_Log("Main window is null");
+    SDL_Quit();
+    return 1;
+  }
 
-  // Input direction
-  std::pair<float, float> inputDirection{0.0f, 0.0f};
+  // Backend system window
+  HWND hwnd =
+      (HWND)SDL_GetPointerProperty(SDL_GetWindowProperties(main_window),
+                                   SDL_PROP_WINDOW_WIN32_HWND_POINTER, NULL);
 
-  while (true) {
+  if (!hwnd) {
+    SDL_Log("Failed to get HWND");
+    SDL_DestroyWindow(main_window);
+    SDL_Quit();
+    return 1;
+  }
+
+  // BGFX initialize
+  bgfx::PlatformData platform_data{};
+  platform_data.nwh = hwnd;
+
+  bgfx::setPlatformData(platform_data);
+
+  bgfx::Init init;
+  init.type = bgfx::RendererType::Direct3D11;
+  init.resolution.width = SCREEN_WIDTH;
+  init.resolution.height = SCREEN_HEIGHT;
+  init.resolution.reset = BGFX_RESET_VSYNC;
+  init.platformData = platform_data;
+
+  if (!bgfx::init(init)) {
+    SDL_Log("BGFX failed to initialize");
+    SDL_DestroyWindow(main_window);
+    SDL_Quit();
+    return 1;
+  }
+
+  // Enable BGFX debug text
+  bgfx::setDebug(BGFX_DEBUG_TEXT);
+
+  // Set BGFX view
+  bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x303030ff, 1.0f,
+                     0);
+  bgfx::setViewRect(0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+  // Main loop
+  while (is_running) {
     SDL_Event event;
+    // Event loop
     while (SDL_PollEvent(&event)) {
       switch (event.type) {
-        case SDL_EVENT_QUIT:
-          SDL_LogInfo(0, "Quit called");
-          SDL_Quit();
-          break;
         case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
-          SDL_LogInfo(0, "Close requested");
-          SDL_DestroyWindow(window);
+          is_running = false;
+          break;
+
+        case SDL_EVENT_QUIT:
+          is_running = false;
           break;
 
         case SDL_EVENT_WINDOW_RESIZED:
-          SDL_LogInfo(0, "Window resized");
-          break;
-
-          // Key down
-        case SDL_EVENT_KEY_DOWN:
-          if (event.key.scancode == SDL_SCANCODE_UP) {
-            inputDirection.first = -1.0f;
-          }
-          if (event.key.scancode == SDL_SCANCODE_DOWN) {
-            inputDirection.first = 1.0f;
-          }
-          if (event.key.scancode == SDL_SCANCODE_LEFT) {
-            inputDirection.second = -1.0f;
-          }
-          if (event.key.scancode == SDL_SCANCODE_RIGHT) {
-            inputDirection.second = 1.0f;
-          }
-          break;
-
-          // Key up
-        case SDL_EVENT_KEY_UP:
-          if (event.key.scancode == SDL_SCANCODE_UP) {
-            inputDirection.first = 0.0f;
-          }
-          if (event.key.scancode == SDL_SCANCODE_DOWN) {
-            inputDirection.first = 0.0f;
-          }
-          if (event.key.scancode == SDL_SCANCODE_LEFT) {
-            inputDirection.second = 0.0f;
-          }
-          if (event.key.scancode == SDL_SCANCODE_RIGHT) {
-            inputDirection.second = 0.0f;
-          }
+          ResetBgfxView(event.window);
           break;
 
         default:
@@ -82,39 +94,26 @@ int main() {
       }
     }
 
-    // Clear and set background color
-    SDL_SetRenderDrawColor(renderer, 0, 150, 150, 255);
-    SDL_RenderClear(renderer);
+    // BGFX render call
+    bgfx::touch(0);
 
-    // Render a rectangle
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-    SDL_RenderFillRect(renderer, &movingRect);
+    bgfx::dbgTextClear();
+    bgfx::dbgTextPrintf(0, 1, 0x4f, "Hello from BGFX!");
 
-    // Rectangle movement logic
-    float proposedY = movingRect.y + 2 * inputDirection.first;
-    float proposedX = movingRect.x + 2 * inputDirection.second;
-
-    if (proposedY < 0) {
-      proposedY = 0;
-    } else if (proposedY + movingRect.h > SCREEN_HEIGHT) {
-      proposedY = SCREEN_HEIGHT - movingRect.h;
-    }
-
-    movingRect.y = proposedY;
-
-    if (proposedX < 0) {
-      proposedX = 0;
-    } else if (proposedX + movingRect.w > SCREEN_WIDTH) {
-      proposedX = SCREEN_WIDTH - movingRect.w;
-    }
-
-    movingRect.x = proposedX;
-
-    // Submit frame
-    SDL_RenderPresent(renderer);
-    SDL_Delay(16);
+    bgfx::frame();
   }
 
+  bgfx::shutdown();
+  SDL_DestroyWindow(main_window);
   SDL_Quit();
+
   return 0;
+}
+
+void ResetBgfxView(const SDL_WindowEvent& windowEvent)
+{
+  const int new_width = windowEvent.data1;
+  const int new_height = windowEvent.data2;
+  bgfx::reset(new_width, new_height, BGFX_RESET_VSYNC);
+  bgfx::setViewRect(0, 0, 0, new_width, new_height);
 }
