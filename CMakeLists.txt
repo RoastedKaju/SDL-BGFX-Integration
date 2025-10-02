@@ -17,6 +17,8 @@ file(GLOB_RECURSE SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp" "${CMAKE_
 # Make executable
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
+
 add_subdirectory(extern/SDL)
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3)
 

@@ -7,7 +7,9 @@
 #include <iostream>
 #include <string>
 
+#include "core/mesh.h"
 #include "shader/shader.h"
+#include "utils/vertex_types.h"
 
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
@@ -77,6 +79,20 @@ int main() {
   Shader shader;
   shader.Create("shaders/vs_basic.bin", "shaders/fs_basic.bin");
 
+  // Buffer layout
+  PosColorVertex::init();
+
+  // Example triangle
+  PosColorVertex verts[] = {
+      {0.0f, 0.5f, 0.0f},
+      {-0.5f, -0.5f, 0.0f},
+      {0.5f, -0.5f, 0.0f},
+  };
+
+  uint16_t indices[] = {0, 1, 2};
+
+  Mesh triangle(verts, 3, indices, 3);
+
   // Main loop
   while (is_running) {
     SDL_Event event;
@@ -106,6 +122,8 @@ int main() {
     bgfx::dbgTextClear();
     bgfx::dbgTextPrintf(0, 1, 0x4f, "Hello from BGFX!");
 
+    triangle.Draw(shader.GetProgramHandle());
+
     bgfx::frame();
   }
 
@@ -116,8 +134,7 @@ int main() {
   return 0;
 }
 
-void ResetBgfxView(const SDL_WindowEvent& windowEvent)
-{
+void ResetBgfxView(const SDL_WindowEvent& windowEvent) {
   const int new_width = windowEvent.data1;
   const int new_height = windowEvent.data2;
   bgfx::reset(new_width, new_height, BGFX_RESET_VSYNC);
