@@ -1,0 +1,3 @@
+shaderc.exe -f vs_basic.sc -o bin/vs_basic.bin --type vertex --platform windows --profile s_5_0
+
+shaderc.exe -f fs_basic.sc -o bin/fs_basic.bin --type fragment --platform windows --profile ps_5_0

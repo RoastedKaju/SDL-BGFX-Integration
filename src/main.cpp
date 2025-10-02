@@ -7,6 +7,8 @@
 #include <iostream>
 #include <string>
 
+#include "shader/shader.h"
+
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
 
@@ -50,7 +52,7 @@ int main() {
   bgfx::setPlatformData(platform_data);
 
   bgfx::Init init;
-  init.type = bgfx::RendererType::Direct3D11;
+  init.type = bgfx::RendererType::OpenGL;
   init.resolution.width = SCREEN_WIDTH;
   init.resolution.height = SCREEN_HEIGHT;
   init.resolution.reset = BGFX_RESET_VSYNC;
@@ -70,6 +72,10 @@ int main() {
   bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x303030ff, 1.0f,
                      0);
   bgfx::setViewRect(0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+  // Shader
+  Shader shader;
+  shader.Create("shaders/vs_basic.bin", "shaders/fs_basic.bin");
 
   // Main loop
   while (is_running) {

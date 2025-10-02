@@ -12,8 +12,10 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     set(OSBitness 64)
 endif()
 
+file(GLOB_RECURSE SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h")
+
 # Make executable
-add_executable(${PROJECT_NAME} "src/main.cpp")
+add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
 add_subdirectory(extern/SDL)
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3)
