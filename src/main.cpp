@@ -75,56 +75,59 @@ int main() {
                      0);
   bgfx::setViewRect(0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-  // Shader
-  Shader shader;
-  shader.Create("shaders/vs_basic.bin", "shaders/fs_basic.bin");
+  // Mesh and shader scope
+  {
+    // Shader
+    Shader shader;
+    shader.Create("shaders/vs_basic.bin", "shaders/fs_basic.bin");
 
-  // Buffer layout
-  PosColorVertex::init();
+    // Buffer layout
+    PosColorVertex::init();
 
-  // Example triangle
-  PosColorVertex verts[] = {
-      {0.0f, 0.5f, 0.0f},
-      {-0.5f, -0.5f, 0.0f},
-      {0.5f, -0.5f, 0.0f},
-  };
+    // Example triangle
+    PosColorVertex verts[] = {
+        {0.0f, 0.5f, 0.0f, 0xff0000ff},    // Top vertex: Red
+        {-0.5f, -0.5f, 0.0f, 0xff00ff00},  // Bottom-left: Green
+        {0.5f, -0.5f, 0.0f, 0xffff0000},   // Bottom-right: Blue
+    };
 
-  uint16_t indices[] = {0, 1, 2};
+    uint16_t indices[] = {0, 1, 2};
 
-  Mesh triangle(verts, 3, indices, 3);
+    Mesh triangle(verts, 3, indices, 3);
 
-  // Main loop
-  while (is_running) {
-    SDL_Event event;
-    // Event loop
-    while (SDL_PollEvent(&event)) {
-      switch (event.type) {
-        case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
-          is_running = false;
-          break;
+    // Main loop
+    while (is_running) {
+      SDL_Event event;
+      // Event loop
+      while (SDL_PollEvent(&event)) {
+        switch (event.type) {
+          case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
+            is_running = false;
+            break;
 
-        case SDL_EVENT_QUIT:
-          is_running = false;
-          break;
+          case SDL_EVENT_QUIT:
+            is_running = false;
+            break;
 
-        case SDL_EVENT_WINDOW_RESIZED:
-          ResetBgfxView(event.window);
-          break;
+          case SDL_EVENT_WINDOW_RESIZED:
+            ResetBgfxView(event.window);
+            break;
 
-        default:
-          break;
+          default:
+            break;
+        }
       }
+
+      // BGFX render call
+      bgfx::touch(0);
+
+      bgfx::dbgTextClear();
+      bgfx::dbgTextPrintf(0, 1, 0x4f, "Hello from BGFX!");
+
+      triangle.Draw(shader.GetProgramHandle());
+
+      bgfx::frame();
     }
-
-    // BGFX render call
-    bgfx::touch(0);
-
-    bgfx::dbgTextClear();
-    bgfx::dbgTextPrintf(0, 1, 0x4f, "Hello from BGFX!");
-
-    triangle.Draw(shader.GetProgramHandle());
-
-    bgfx::frame();
   }
 
   bgfx::shutdown();
