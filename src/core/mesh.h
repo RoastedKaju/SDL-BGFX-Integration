@@ -6,7 +6,7 @@
 
 class Mesh {
  public:
-  Mesh(const PosColorVertex* vertices, uint32_t num_vertices,
+  Mesh(const PosColorTexVertex* vertices, uint32_t num_vertices,
        const uint16_t* indices, uint32_t num_indices);
   ~Mesh();
 

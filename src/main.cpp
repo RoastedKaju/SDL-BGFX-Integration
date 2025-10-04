@@ -8,6 +8,7 @@
 #include <string>
 
 #include "core/mesh.h"
+#include "core/texture.h"
 #include "shader/shader.h"
 #include "utils/vertex_types.h"
 
@@ -82,18 +83,27 @@ int main() {
     shader.Create("shaders/vs_basic.bin", "shaders/fs_basic.bin");
 
     // Buffer layout
-    PosColorVertex::init();
+    PosColorTexVertex::init();
 
     // Example triangle
-    PosColorVertex verts[] = {
-        {0.0f, 0.5f, 0.0f, 0xff0000ff},    // Top vertex: Red
-        {-0.5f, -0.5f, 0.0f, 0xff00ff00},  // Bottom-left: Green
-        {0.5f, -0.5f, 0.0f, 0xffff0000},   // Bottom-right: Blue
+    PosColorTexVertex verts[] = {
+        {0.0f, 0.5f, 0.0f, 0xffffffff, 0.5f, 0.0f},
+        {-0.5f, -0.5f, 0.0f, 0xffffffff, 0.0f, 1.0f},
+        {0.5f, -0.5f, 0.0f, 0xffffffff, 1.0f, 1.0f},
     };
 
     uint16_t indices[] = {0, 1, 2};
 
+    // Triangle mesh
     Mesh triangle(verts, 3, indices, 3);
+
+    // Metal texture
+    Texture metal_texture;
+    metal_texture.Load("textures/metal_grate_rusty_diff_2k.jpg");
+
+    // Find sampler uniform location
+    bgfx::UniformHandle sampler_uniform =
+        bgfx::createUniform("s_texColor", bgfx::UniformType::Sampler);
 
     // Main loop
     while (is_running) {
@@ -123,6 +133,8 @@ int main() {
 
       bgfx::dbgTextClear();
       bgfx::dbgTextPrintf(0, 1, 0x4f, "Hello from BGFX!");
+
+      bgfx::setTexture(0, sampler_uniform, metal_texture.GetHandle());
 
       triangle.Draw(shader.GetProgramHandle());
 

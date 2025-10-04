@@ -5,6 +5,9 @@
 
 class Shader {
  public:
+  Shader();
+  ~Shader();
+
   static const bgfx::Memory* Load(const char* path);
 
   void Create(const char* vs_path, const char* fs_path);

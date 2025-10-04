@@ -3,6 +3,16 @@
 #include <SDL3/SDL.h>
 #include <fstream>
 
+Shader::Shader() {
+  program_ = BGFX_INVALID_HANDLE;
+}
+
+Shader::~Shader() {
+  if (bgfx::isValid(program_)) {
+    bgfx::destroy(program_);
+  }
+}
+
 const bgfx::Memory* Shader::Load(const char* path) {
   std::ifstream file(path, std::ios::binary | std::ios::ate);
 
