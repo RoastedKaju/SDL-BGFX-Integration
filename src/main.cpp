@@ -7,6 +7,7 @@
 #include <iostream>
 #include <string>
 
+#include "core/material.h"
 #include "core/mesh.h"
 #include "core/texture.h"
 #include "shader/shader.h"
@@ -100,10 +101,9 @@ int main() {
     // Metal texture
     Texture metal_texture;
     metal_texture.Load("textures/metal_grate_rusty_diff_2k.jpg");
-
-    // Find sampler uniform location
-    bgfx::UniformHandle sampler_uniform =
-        bgfx::createUniform("s_texColor", bgfx::UniformType::Sampler);
+    // Material setup
+    Material metal_material(shader.GetProgramHandle());
+    metal_material.SetTexture(metal_texture);
 
     // Main loop
     while (is_running) {
@@ -134,7 +134,7 @@ int main() {
       bgfx::dbgTextClear();
       bgfx::dbgTextPrintf(0, 1, 0x4f, "Hello from BGFX!");
 
-      bgfx::setTexture(0, sampler_uniform, metal_texture.GetHandle());
+      metal_material.Bind();
 
       triangle.Draw(shader.GetProgramHandle());
 
