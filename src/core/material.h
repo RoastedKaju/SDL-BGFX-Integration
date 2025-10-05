@@ -19,7 +19,7 @@ class Material {
   bgfx::ProgramHandle program_;
   bgfx::UniformHandle sampler_;
 
-  const Texture* kTexture_;
+  const Texture* texture_;
 };
 
 #endif  // !MATERIAL_H_

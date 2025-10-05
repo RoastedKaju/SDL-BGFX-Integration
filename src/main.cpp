@@ -9,6 +9,7 @@
 
 #include "core/material.h"
 #include "core/mesh.h"
+#include "core/renderable.h"
 #include "core/texture.h"
 #include "shader/shader.h"
 #include "utils/vertex_types.h"
@@ -96,14 +97,18 @@ int main() {
     uint16_t indices[] = {0, 1, 2};
 
     // Triangle mesh
-    Mesh triangle(verts, 3, indices, 3);
+    auto triangle = std::make_shared<Mesh>(verts, 3, indices, 3);
 
     // Metal texture
-    Texture metal_texture;
-    metal_texture.Load("textures/metal_grate_rusty_diff_2k.jpg");
+    auto metal_texture = std::make_shared<Texture>();
+    metal_texture->Load("textures/metal_grate_rusty_diff_2k.jpg");
+
     // Material setup
-    Material metal_material(shader.GetProgramHandle());
-    metal_material.SetTexture(metal_texture);
+    auto metal_material = std::make_shared<Material>(shader.GetProgramHandle());
+    metal_material->SetTexture(*metal_texture);
+
+    // Wrap the mesh and material with renderable
+    Renderable renderable{triangle, metal_material};
 
     // Main loop
     while (is_running) {
@@ -134,9 +139,7 @@ int main() {
       bgfx::dbgTextClear();
       bgfx::dbgTextPrintf(0, 1, 0x4f, "Hello from BGFX!");
 
-      metal_material.Bind();
-
-      triangle.Draw(shader.GetProgramHandle());
+      renderable.Draw(0);
 
       bgfx::frame();
     }
