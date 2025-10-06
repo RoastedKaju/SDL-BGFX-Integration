@@ -2,6 +2,7 @@
 #define RENDERABLE_H_
 
 #include <bgfx/bgfx.h>
+#include <bx/math.h>
 #include <memory>
 
 #include "material.h"
@@ -16,10 +17,19 @@ class Renderable {
   inline std::shared_ptr<Mesh> GetMesh() const { return mesh_; }
   inline std::shared_ptr<Material> GetMaterial() const { return material_; }
 
+  void SetPosition(const bx::Vec3& pos);
+  void SetRotation(const bx::Vec3& rot);
+
  private:
+  void UpdateTransform();
+
   std::shared_ptr<Mesh> mesh_;
   std::shared_ptr<Material> material_;
-  // Transform
+
+  bx::Vec3 position_;
+  bx::Vec3 rotation_;
+
+  float transform_[16];
 };
 
 #endif  // !RENDERABLE_H_
