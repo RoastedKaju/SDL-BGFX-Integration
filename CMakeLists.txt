@@ -32,4 +32,8 @@ add_subdirectory(extern/assimp)
 target_link_libraries(${PROJECT_NAME} PRIVATE assimp::assimp)
 
 
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_SOURCE_DIR}/build/extern/SDL/Debug/SDL3.dll" $<TARGET_FILE_DIR:${PROJECT_NAME}>)
+set(SDL_DLL "$<IF:$<CONFIG:Debug>,SDL3d.dll,SDL3.dll>")
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_SOURCE_DIR}/build/extern/SDL/$<CONFIG>/${SDL_DLL}" $<TARGET_FILE_DIR:${PROJECT_NAME}>)
+
+# Resource path
+target_compile_definitions(${PROJECT_NAME} PUBLIC RESOURCE_PATH="../resource")

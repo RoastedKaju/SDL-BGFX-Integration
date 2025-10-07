@@ -84,7 +84,8 @@ int main() {
   {
     // Shader
     Shader shader;
-    shader.Create("shaders/vs_basic.bin", "shaders/fs_basic.bin");
+    shader.Create(RESOURCE_PATH "/shaders/vs_basic.bin",
+                  RESOURCE_PATH "/shaders/fs_basic.bin");
 
     // Buffer layout
     PosColorTexVertex::init();
@@ -103,7 +104,8 @@ int main() {
 
     // Metal texture
     auto metal_texture = std::make_shared<Texture>();
-    metal_texture->Load("textures/metal_grate_rusty_diff_2k.jpg");
+    metal_texture->Load(RESOURCE_PATH
+                        "/textures/metal_grate_rusty_diff_2k.jpg");
 
     // Material setup
     auto metal_material = std::make_shared<Material>(shader.GetProgramHandle());

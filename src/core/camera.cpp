@@ -9,7 +9,7 @@ Camera::Camera()
   bx::mtxIdentity(proj_);
   projection_type_ = ProjectionType::Perspective;
 
-  SetPerspective(bx::toRad(60.0f), 1920.0f / 1080.0f, 0.1, 100.0f);
+  SetPerspective(bx::toRad(60.0f), 800.0f / 600.0f, 0.1, 100.0f);
 }
 
 Camera::~Camera() {}
