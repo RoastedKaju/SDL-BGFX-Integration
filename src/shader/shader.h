@@ -8,8 +8,10 @@ class Shader {
   Shader();
   ~Shader();
 
+  // Load shader from path
   static const bgfx::Memory* Load(const char* path);
 
+  // Create shader program
   void Create(const char* vs_path, const char* fs_path);
 
   inline bgfx::ProgramHandle GetProgramHandle() const { return program_; }

@@ -4,12 +4,9 @@
 #include <bgfx/bgfx.h>
 
 struct PosColorTexVertex {
-  float x;
-  float y;
-  float z;
+  float x, y, z;
   uint32_t abgr;
-  float u;
-  float v;
+  float u, v;
 
   static bgfx::VertexLayout layout;
 

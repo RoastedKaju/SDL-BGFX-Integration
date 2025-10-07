@@ -8,9 +8,11 @@
 #include "material.h"
 #include "mesh.h"
 
+// Renderable references the meshes loaded into memory and creates instances
 class Renderable {
  public:
-  Renderable(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material);
+  Renderable(const std::shared_ptr<Mesh>& mesh,
+             const std::shared_ptr<Material>& material);
 
   void Draw(uint8_t viewID) const;
 
@@ -21,10 +23,11 @@ class Renderable {
   void SetRotation(const bx::Vec3& rot);
 
  private:
+  // Recreates the model matrix after you have changed position, rotation or scale
   void UpdateTransform();
 
-  std::shared_ptr<Mesh> mesh_;
-  std::shared_ptr<Material> material_;
+  std::shared_ptr<Mesh> mesh_;          // Pointer to mesh in memory
+  std::shared_ptr<Material> material_;  // Pointer to material in memory
 
   bx::Vec3 position_;
   bx::Vec3 rotation_;

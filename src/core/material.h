@@ -9,7 +9,8 @@ class Material {
   Material(bgfx::ProgramHandle program);
   ~Material();
 
-  void SetTexture(const Texture& texture);
+  // Assign the diffuse texture
+  void SetDiffuse(const Texture& texture);
 
   void Bind() const;
 
@@ -17,9 +18,11 @@ class Material {
 
  private:
   bgfx::ProgramHandle program_;
+
   bgfx::UniformHandle sampler_;
 
-  const Texture* texture_;
+  // Pointer to diffuse texture
+  const Texture* diffuse_;
 };
 
 #endif  // !MATERIAL_H_
