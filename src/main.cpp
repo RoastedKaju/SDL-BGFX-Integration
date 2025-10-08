@@ -11,6 +11,7 @@
 #include "core/camera.h"
 #include "core/material.h"
 #include "core/mesh.h"
+#include "core/model.h"
 #include "core/renderable.h"
 #include "core/texture.h"
 #include "shader/shader.h"
